@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthForm } from "@/components/auth/auth-form";
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
   const errorParam = searchParams.get("error");
@@ -21,9 +22,7 @@ export default function LoginPage() {
         <CardContent>
           {registered && (
             <Alert className="mb-4">
-              <AlertDescription>
-                注册成功！请登录。
-              </AlertDescription>
+              <AlertDescription>注册成功！请登录。</AlertDescription>
             </Alert>
           )}
           {errorParam && (
@@ -43,5 +42,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[calc(100vh-4rem)] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
