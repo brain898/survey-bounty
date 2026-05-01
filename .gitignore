@@ -42,9 +42,6 @@ conversations/
 # vercel
 .vercel
 
-# cloudflare
-.worker-next/
-.wrangler/
 
 # typescript
 *.tsbuildinfo
