@@ -42,6 +42,10 @@ conversations/
 # vercel
 .vercel
 
+# cloudflare
+.worker-next/
+.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
