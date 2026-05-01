@@ -1,17 +1,12 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+// 简化版中间件 - 只做基本请求转发，不做 Supabase session 刷新
+// 认证由客户端 AuthProvider 处理
+export function middleware(request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    // 只对需要认证的路由和 API 路由做 session 刷新
-    // 公开页面（首页 / 填写页）不走中间件，加载更快
-    "/dashboard/:path*",
-    "/api/:path*",
-    "/auth/:path*",
-    "/response/:path*",
-  ],
+  matcher: [],
 };
