@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { createClient } from "@/lib/supabase/client";
 
 interface AuthFormProps {
   mode: "login" | "register";
@@ -13,6 +14,7 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
@@ -25,29 +27,27 @@ export function AuthForm({ mode }: AuthFormProps) {
     setLoading(true);
 
     try {
-      const endpoint = mode === "login" ? "/api/auth/sign-in" : "/api/auth/sign-up";
-      const body = mode === "login"
-        ? { email, password }
-        : { email, password, nickname };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "操作失败");
-        return;
-      }
-
-      if (mode === "register") {
-        router.push("/auth/login?registered=true");
-      } else {
+      if (mode === "login") {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) {
+          setError(signInError.message);
+          return;
+        }
         router.push("/dashboard");
-        router.refresh();
+      } else {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { nickname } },
+        });
+        if (signUpError) {
+          setError(signUpError.message);
+          return;
+        }
+        router.push("/auth/login?registered=true");
       }
     } catch {
       setError("网络错误，请重试");
