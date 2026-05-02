@@ -1,13 +1,20 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { generateShareCode } from "@/lib/utils/share-code";
+import { checkRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
 
+  // 先鉴权拿用户，再限流（用 user.id 而非 IP，避免校园网误伤）
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "请先登录" }, { status: 401 });
+  }
+
+  // 速率限制：每个用户每小时最多创建 20 个任务
+  if (!(await checkRateLimit(`create:${user.id}`, 20, 3600_000))) {
+    return NextResponse.json({ error: "创建太频繁，请稍后再试" }, { status: 429 });
   }
 
   const body = await request.json();
@@ -19,8 +26,14 @@ export async function POST(request: Request) {
   if (!reward_amount || reward_amount <= 0) {
     return NextResponse.json({ error: "请设置赏金金额" }, { status: 400 });
   }
-  if (!max_slots || max_slots <= 0) {
-    return NextResponse.json({ error: "请设置名额" }, { status: 400 });
+  if (!max_slots || max_slots <= 0 || max_slots > 999) {
+    return NextResponse.json({ error: "名额需在 1-999 之间" }, { status: 400 });
+  }
+  if (title.trim().length > 100) {
+    return NextResponse.json({ error: "标题不能超过 100 字" }, { status: 400 });
+  }
+  if (description && description.trim().length > 500) {
+    return NextResponse.json({ error: "描述不能超过 500 字" }, { status: 400 });
   }
 
   const shareCode = generateShareCode();

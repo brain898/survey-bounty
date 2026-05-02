@@ -5,14 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { CompletionStatus } from "@/types/database";
 
-const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+const statusLabels: Record<CompletionStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "等待审核", variant: "secondary" },
   verified: { label: "已审核，等打款", variant: "outline" },
   paid: { label: "已付款，请确认收款", variant: "default" },
   confirmed: { label: "已确认收款", variant: "outline" },
-  disputed: { label: "已举报", variant: "destructive" },
+  dispute_pending: { label: "举报待仲裁", variant: "destructive" },
+  disputed: { label: "仲裁结果：赖账", variant: "destructive" },
 };
+
+interface CompletionDetail {
+  id: string;
+  completer_wechat: string;
+  payment_status: CompletionStatus;
+  created_at: string;
+}
+
+interface TaskInfo {
+  title: string;
+  reward_amount: number;
+  creator_id: string;
+}
 
 export default function CompletionDetailPage({
   params,
@@ -21,8 +36,8 @@ export default function CompletionDetailPage({
 }) {
   const { id } = use(params);
   const [data, setData] = useState<{
-    completion: { id: string; completer_wechat: string; payment_status: string; created_at: string };
-    task: { title: string; reward_amount: number; creator_id: string } | null;
+    completion: CompletionDetail;
+    task: TaskInfo | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -99,6 +114,7 @@ export default function CompletionDetailPage({
 
           {data.completion.payment_status === "pending" && <p className="text-center text-sm text-muted-foreground">等待发布者审核截图</p>}
           {data.completion.payment_status === "verified" && <p className="text-center text-sm text-muted-foreground">截图已审核通过，等待发布者打款</p>}
+          {data.completion.payment_status === "dispute_pending" && <p className="text-center text-sm text-muted-foreground">举报已提交，等待平台仲裁</p>}
           {(data.completion.payment_status === "confirmed" || data.completion.payment_status === "disputed") && <p className="text-center text-sm text-muted-foreground">该记录已处理完毕</p>}
         </CardContent>
       </Card>

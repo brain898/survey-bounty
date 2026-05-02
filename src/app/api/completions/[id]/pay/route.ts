@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-// POST - 发布者标记已付款（verified → paid）
+// POST - 发布者标记已付款（verified/dispute_pending → paid）
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -24,8 +24,9 @@ export async function POST(
     return NextResponse.json({ error: "无权限" }, { status: 403 });
   }
 
-  if (completion.payment_status !== "verified") {
-    return NextResponse.json({ error: "请先审核通过" }, { status: 400 });
+  // 支持从 verified 或 dispute_pending 状态标记付款
+  if (!["verified", "dispute_pending"].includes(completion.payment_status)) {
+    return NextResponse.json({ error: "当前状态无法标记付款" }, { status: 400 });
   }
 
   const { error } = await supabase

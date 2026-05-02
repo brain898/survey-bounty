@@ -14,7 +14,8 @@ const statusLabels: Record<string, { label: string; variant: "default" | "second
   verified: { label: "已审核", variant: "outline" },
   paid: { label: "已付款", variant: "default" },
   confirmed: { label: "已确认", variant: "default" },
-  disputed: { label: "争议中", variant: "destructive" },
+  dispute_pending: { label: "待仲裁", variant: "destructive" },
+  disputed: { label: "已仲裁", variant: "destructive" },
 };
 
 export default function TaskDetailPage({
@@ -104,6 +105,7 @@ export default function TaskDetailPage({
   const pendingCount = completions.filter((c) => c.payment_status === "pending").length;
   const verifiedCount = completions.filter((c) => c.payment_status === "verified").length;
   const confirmedCount = completions.filter((c) => c.payment_status === "confirmed").length;
+  const disputeCount = completions.filter((c) => c.payment_status === "dispute_pending" || c.payment_status === "disputed").length;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
@@ -155,6 +157,12 @@ export default function TaskDetailPage({
           <div className="text-xl sm:text-2xl font-bold text-green-500">{confirmedCount}</div>
           <p className="text-xs text-muted-foreground mt-0.5">已完成</p>
         </CardContent></Card>
+        {disputeCount > 0 && (
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-xl sm:text-2xl font-bold text-red-500">{disputeCount}</div>
+            <p className="text-xs text-muted-foreground mt-0.5">有争议</p>
+          </CardContent></Card>
+        )}
       </div>
 
       {/* 操作栏 */}
@@ -219,8 +227,14 @@ export default function TaskDetailPage({
                       {c.payment_status === "confirmed" && (
                         <span className="text-xs text-green-600 font-medium">已完成</span>
                       )}
+                      {c.payment_status === "dispute_pending" && (
+                        <div className="flex gap-2">
+                          <Badge variant="destructive" className="text-xs">待仲裁</Badge>
+                          <Button size="sm" variant="outline" className="h-6 text-xs px-2" onClick={() => handleAction(c.id, "pay")}>补付款</Button>
+                        </div>
+                      )}
                       {c.payment_status === "disputed" && (
-                        <Badge variant="destructive" className="text-xs">有争议</Badge>
+                        <Badge variant="destructive" className="text-xs">仲裁：赖账</Badge>
                       )}
                     </div>
                   </div>

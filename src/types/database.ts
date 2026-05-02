@@ -5,11 +5,12 @@
 
 export type TaskStatus = "active" | "full" | "closed" | "deleted";
 export type CompletionStatus =
-  | "pending"    // 待审核
-  | "verified"   // 已审核，等打款
-  | "paid"       // 已付款
-  | "confirmed"  // 已确认收到
-  | "disputed";  // 争议中
+  | "pending"          // 待审核
+  | "verified"         // 已审核，等打款
+  | "paid"             // 发布者标记已付款
+  | "confirmed"        // 填写者确认收到
+  | "dispute_pending"  // 举报待仲裁（不直接扣分）
+  | "disputed";        // 仲裁结果：确认赖账（扣分）
 
 export type UserRole = "publisher" | "filler";
 
