@@ -63,16 +63,16 @@ export default function HomePage() {
 
   return (
     <div className="bg-warm-gradient">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:py-20">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:py-20">
         {/* Hero */}
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="animate-fade-in-up">
-            <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary tracking-wide uppercase mb-6">
+            <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary tracking-wide uppercase mb-4 sm:mb-6">
               大学生互助平台
             </span>
           </div>
 
-          <h1 className="animate-fade-in-up delay-100 text-4xl sm:text-6xl font-bold tracking-tight leading-[1.1]">
+          <h1 className="animate-fade-in-up delay-100 text-3xl sm:text-6xl font-bold tracking-tight leading-[1.1]">
             发悬赏
             <br />
             <span className="bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -80,13 +80,13 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="animate-fade-in-up delay-200 mt-5 sm:mt-7 text-base sm:text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
+          <p className="animate-fade-in-up delay-200 mt-4 sm:mt-7 text-sm sm:text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
             上传任务截图、设置赏金，同学完成后截图领取红包。
             <br className="hidden sm:block" />
             填问卷、做调研，一个链接搞定。
           </p>
 
-          <div className="animate-fade-in-up delay-300 mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3">
+          <div className="animate-fade-in-up delay-300 mt-6 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3">
             {user ? (
               <Link href="/dashboard">
                 <Button size="lg" className="w-full sm:w-auto px-8 h-12 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow">

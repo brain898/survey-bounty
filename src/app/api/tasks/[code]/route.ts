@@ -16,11 +16,12 @@ export async function GET(
     .in("status", ["active", "full", "closed"])
     .single();
 
+  // task 不存在时直接返回，不再做第二次查询
   if (error || !task) {
     return NextResponse.json({ error: "任务不存在" }, { status: 404 });
   }
 
-  // 查发布者信用分
+  // 只在 task 存在时才查信用分
   const { data: credit } = await supabase
     .from("credit_scores")
     .select("credit_score, total_surveys, completed_payments")

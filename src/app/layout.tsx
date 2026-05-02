@@ -30,6 +30,7 @@ export default function RootLayout({
     <html
       lang="zh-CN"
       className={`${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col grain-overlay">
         <AuthProvider>
