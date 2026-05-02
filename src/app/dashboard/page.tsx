@@ -35,14 +35,16 @@ function DashboardContent() {
   const [copiedCode, setCopiedCode] = useState("");
 
   useEffect(() => {
-    if (!authLoading && !user) { router.push("/auth/login"); return; }
-    if (user) {
-      fetch("/api/tasks/list")
-        .then((res) => res.json())
-        .then((data) => setTasks(data.tasks || []))
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }
+    // 立即开始拉任务（cookie 已有，API 自己会校验权限），不必等 AuthProvider 完成
+    fetch("/api/tasks/list")
+      .then((res) => res.json())
+      .then((data) => setTasks(data.tasks || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!authLoading && !user) router.push("/auth/login");
   }, [user, authLoading, router]);
 
   const copyLink = (code: string) => {
@@ -51,14 +53,15 @@ function DashboardContent() {
     setTimeout(() => setCopiedCode(""), 2000);
   };
 
-  if (authLoading || loading) {
+  // 只要任一已经加载好就先渲染骨架，而不是两个都得等
+  if (loading && authLoading) {
     return (
       <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
-  if (!user) return null;
+  if (!authLoading && !user) return null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
