@@ -7,7 +7,7 @@ import { AuthForm } from "@/components/auth/auth-form";
 export default function RegisterPage() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md animate-fade-in-up">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">注册</CardTitle>
           <CardDescription>创建你的问卷悬赏账号</CardDescription>

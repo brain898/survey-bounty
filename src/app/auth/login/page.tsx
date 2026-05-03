@@ -14,7 +14,7 @@ function LoginContent() {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md animate-fade-in-up">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">登录</CardTitle>
           <CardDescription>登录你的问卷悬赏账号</CardDescription>
