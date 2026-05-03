@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import { Stagger } from "@/components/stagger";
 import type { Task } from "@/types/database";
 
 const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -61,35 +62,60 @@ function DashboardContent() {
       </div>
     );
   }
+  // auth 没加载好时不跳转，避免闪跳
   if (!authLoading && !user) return null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
-      {createdCode && (
-        <Alert className="mb-5">
-          <AlertDescription className="text-sm">
-            任务发布成功！分享链接给同学：
-            <code className="block mt-1 bg-muted px-2 py-1 rounded text-xs break-all">
-              {typeof window !== "undefined" ? window.location.origin : ""}/t/{createdCode}
-            </code>
-          </AlertDescription>
-        </Alert>
-      )}
+      <Stagger interval={100}>
+        {createdCode && (
+          <Alert className="mb-5">
+            <AlertDescription className="text-sm">
+              任务发布成功！分享链接给同学：
+              <code className="block mt-1 bg-muted px-2 py-1 rounded text-xs break-all">
+                {typeof window !== "undefined" ? window.location.origin : ""}/t/{createdCode}
+              </code>
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* 页头 */}
-      <div className="flex items-center justify-between mb-6 gap-3">
-        <div>
-          <h1 className="text-xl sm:text-3xl font-bold">我的任务</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            共 {tasks.length} 个任务
-          </p>
+        {/* 页头 */}
+        <div className="flex items-center justify-between mb-6 gap-3">
+          <div>
+            <h1 className="text-xl sm:text-3xl font-bold">我的任务</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              {loading ? "加载中..." : `共 ${tasks.length} 个任务`}
+            </p>
+          </div>
+          <Link href="/dashboard/create">
+            <Button size="sm" className="sm:text-sm">+ 发布任务</Button>
+          </Link>
         </div>
-        <Link href="/dashboard/create">
-          <Button size="sm" className="sm:text-sm">+ 发布任务</Button>
-        </Link>
-      </div>
 
-      {tasks.length === 0 ? (
+        {loading ? (
+        <div className="space-y-3">
+          {[1, 2].map((i) => (
+            <Card key={i} className="border-border/50">
+              <CardContent className="pt-4 pb-4 sm:pt-5 sm:pb-5">
+                <div className="animate-pulse space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 bg-muted rounded w-1/3" />
+                    <div className="h-5 bg-muted rounded w-12" />
+                  </div>
+                  <div className="h-1.5 bg-muted rounded-full w-full" />
+                  <div className="flex justify-between">
+                    <div className="h-3 bg-muted rounded w-1/4" />
+                    <div className="flex gap-2">
+                      <div className="h-8 bg-muted rounded w-14" />
+                      <div className="h-8 bg-muted rounded w-16" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : tasks.length === 0 ? (
         <Card>
           <CardContent className="pt-8 pb-8">
             <div className="text-center text-muted-foreground">
@@ -101,13 +127,17 @@ function DashboardContent() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {tasks.map((task) => {
+          {tasks.map((task, taskIndex) => {
             const status = statusLabels[task.status];
             const progress = task.max_slots > 0
               ? Math.round((task.current_completions / task.max_slots) * 100)
               : 0;
             return (
-              <Card key={task.id} className="card-hover border-border/50">
+              <Card
+                key={task.id}
+                className="card-hover border-border/50 animate-fade-in-up"
+                style={{ animationDelay: `${200 + taskIndex * 60}ms` }}
+              >
                 <CardContent className="pt-4 pb-4 sm:pt-5 sm:pb-5">
                   {/* 标题行 */}
                   <div className="flex items-start justify-between gap-2 mb-3">
@@ -157,6 +187,7 @@ function DashboardContent() {
           })}
         </div>
       )}
+      </Stagger>
     </div>
   );
 }
