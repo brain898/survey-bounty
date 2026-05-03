@@ -127,14 +127,17 @@ export default function TaskFillPage({
                 平台不担保资金到账，请自行与发布者确认
               </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
-              记录编号：{completionId}
-            </p>
-            <a href="/my" className="inline-block mt-4">
-              <Button variant="outline" size="sm">查看我的提交状态</Button>
+            <div className="mt-3 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+              <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                <strong>重要：</strong>如果还没开启「允许通过手机号向我转账」，发布者将无法给你转账。
+                <br />路径：微信 → 我 → 服务 → 钱包 → 支付设置 → 允许通过手机号向我转账
+              </p>
+            </div>
+            <a href="/my" className="block mt-4">
+              <Button className="w-full" size="lg">查看我的提交状态</Button>
             </a>
-            <p className="text-xs text-muted-foreground mt-2">
-              用此手机号登录可随时查看审核和收款进度
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              用手机号 {phone} 随时查看审核和收款进度
             </p>
           </CardContent>
         </Card>
@@ -312,13 +315,19 @@ export default function TaskFillPage({
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="用于微信转账收款"
+                  placeholder="用于微信手机号转账收款"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
                   发布者通过微信手机号转账给你
                 </p>
+                <div className="rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-2.5 mt-1">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                    <strong>收款前提醒：</strong>请先确认你的微信已开启「允许通过手机号向我转账」。
+                    <br />路径：微信 → 我 → 服务 → 钱包 → 支付设置 → 允许通过手机号向我转账
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
