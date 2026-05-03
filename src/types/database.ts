@@ -42,12 +42,15 @@ export interface Task {
 export interface TaskCompletion {
   id: string;
   task_id: string;
-  completer_wechat: string;
+  completer_name: string | null;
+  completer_phone: string | null;
+  completer_wechat: string | null;  // 旧字段，历史数据兼容，新数据不再写入
   proof_screenshot_url: string | null;
   payment_status: CompletionStatus;
   paid_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
+  verified_at: string | null;
   created_at: string;
   updated_at: string;
 }

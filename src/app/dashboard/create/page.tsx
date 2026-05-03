@@ -170,11 +170,16 @@ export default function CreateTaskPage() {
         </Card>
 
         {/* 提交 */}
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()} className="w-full sm:w-auto">取消</Button>
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-            {loading ? "创建中..." : "发布任务"}
-          </Button>
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground text-center sm:text-right">
+            发布后，您承诺通过微信向完成者支付报酬。平台仅提供撮合服务，不介入资金环节。
+          </p>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <Button type="button" variant="outline" onClick={() => router.back()} className="w-full sm:w-auto">取消</Button>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+              {loading ? "创建中..." : "发布任务"}
+            </Button>
+          </div>
         </div>
         </form>
       </Stagger>

@@ -1,20 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-// POST - 发布者确认已付款，完成者确认收款（paid → confirmed）
-// 用事务 RPC 保证「状态更新 + 信用分加减」原子性
+// POST - 确认收款（paid → confirmed）
+// 发布者或填写者均可操作：
+// - 发布者通过 dashboard 操作（需登录，校验 creator_id）
+// - 填写者通过 /response/{completion_id} 操作（未登录，completion_id UUID 不可猜测即为鉴权）
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const supabase = await createClient();
-
-  // 鉴权：必须登录
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "请先登录" }, { status: 401 });
-  }
 
   const { data: completion, error: fetchError } = await supabase
     .from("task_completions")
@@ -30,8 +26,9 @@ export async function POST(
   const task = Array.isArray(completion.tasks) ? completion.tasks[0] : completion.tasks;
   const creatorId = task?.creator_id;
 
-  // 鉴权：只有任务发布者才能操作
-  if (creatorId !== user.id) {
+  // 鉴权：如果有登录用户，校验是发布者；未登录用户通过 completion_id 鉴权（UUID 不可猜测）
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user && creatorId !== user.id) {
     return NextResponse.json({ error: "无权操作" }, { status: 403 });
   }
 

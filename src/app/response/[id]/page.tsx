@@ -18,7 +18,8 @@ const statusLabels: Record<CompletionStatus, { label: string; variant: "default"
 
 interface CompletionDetail {
   id: string;
-  completer_wechat: string;
+  completer_name: string | null;
+  completer_phone: string | null;
   payment_status: CompletionStatus;
   created_at: string;
 }
@@ -101,15 +102,21 @@ export default function CompletionDetailPage({
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">赏金</span><span className="font-medium">{((data.task?.reward_amount || 0) / 100).toFixed(2)} 元</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">微信号</span><span className="font-mono">{data.completion.completer_wechat}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">姓名</span><span className="font-medium">{data.completion.completer_name || "未填写"}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">手机号</span><span>{data.completion.completer_phone || "未填写"}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">提交时间</span><span>{new Date(data.completion.created_at).toLocaleString("zh-CN")}</span></div>
           </div>
 
           {data.completion.payment_status === "paid" && (
-            <div className="flex gap-3">
-              <Button className="flex-1" onClick={handleConfirm} disabled={actionLoading}>确认收到</Button>
-              <Button variant="destructive" className="flex-1" onClick={handleDispute} disabled={actionLoading}>举报未收到</Button>
-            </div>
+            <>
+              <p className="text-xs text-amber-700 dark:text-amber-400 text-center">
+                请确认微信转账已到账。如未收到，可选择举报。
+              </p>
+              <div className="flex gap-3">
+                <Button className="flex-1" onClick={handleConfirm} disabled={actionLoading}>确认收到</Button>
+                <Button variant="destructive" className="flex-1" onClick={handleDispute} disabled={actionLoading}>举报未收到</Button>
+              </div>
+            </>
           )}
 
           {data.completion.payment_status === "pending" && <p className="text-center text-sm text-muted-foreground">等待发布者审核截图</p>}

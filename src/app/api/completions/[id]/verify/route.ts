@@ -30,7 +30,7 @@ export async function POST(
 
   const { error } = await supabase
     .from("task_completions")
-    .update({ payment_status: "verified" })
+    .update({ payment_status: "verified", verified_at: new Date().toISOString() })
     .eq("id", id);
 
   if (error) {
