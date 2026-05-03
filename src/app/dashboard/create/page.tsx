@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { uploadImage } from "@/lib/supabase/storage";
+import { Stagger } from "@/components/stagger";
 
 export default function CreateTaskPage() {
   const { user, loading: authLoading } = useAuth();
@@ -86,18 +87,19 @@ export default function CreateTaskPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-3xl font-bold">发布任务</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">上传任务截图、设置赏金，生成分享链接</p>
-      </div>
+      <Stagger interval={100}>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-3xl font-bold">发布任务</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">上传任务截图、设置赏金，生成分享链接</p>
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-        {error && (
-          <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>
-        )}
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+          {error && (
+            <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>
+          )}
 
-        {/* 任务信息 */}
-        <Card>
+          {/* 任务信息 */}
+          <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">任务信息</CardTitle>
           </CardHeader>
@@ -174,7 +176,8 @@ export default function CreateTaskPage() {
             {loading ? "创建中..." : "发布任务"}
           </Button>
         </div>
-      </form>
+        </form>
+      </Stagger>
     </div>
   );
 }

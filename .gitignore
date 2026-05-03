@@ -47,3 +47,5 @@ conversations/
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+.vercel

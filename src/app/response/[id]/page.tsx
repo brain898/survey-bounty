@@ -85,7 +85,7 @@ export default function CompletionDetailPage({
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
-      <Card>
+      <Card className="animate-fade-in-up">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{data.task?.title || "任务"}</CardTitle>
           <CardDescription>完成记录详情</CardDescription>
