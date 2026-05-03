@@ -9,16 +9,16 @@ export async function GET(
   const { code } = await params;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) {
     return NextResponse.json({ error: "请先登录" }, { status: 401 });
   }
 
   const { data: task } = await supabase
     .from("tasks")
-    .select("*")
+    .select("id")
     .eq("share_code", code)
-    .eq("creator_id", user.id)
+    .eq("creator_id", session.user.id)
     .single();
 
   if (!task) {
@@ -27,9 +27,9 @@ export async function GET(
 
   const { data: completions } = await supabase
     .from("task_completions")
-    .select("*")
+    .select("id, completer_name, completer_phone, payment_status, proof_screenshot_url, created_at")
     .eq("task_id", task.id)
     .order("created_at", { ascending: false });
 
-  return NextResponse.json({ task, completions: completions || [] });
+  return NextResponse.json({ completions: completions || [] });
 }

@@ -37,15 +37,18 @@ export default function TaskDetailPage({
     try {
       const taskRes = await fetch(`/api/tasks/detail/${id}`);
       const taskData = await taskRes.json();
-      if (!taskRes.ok || !taskData.task) { setError(taskData.error || "任务不存在"); return; }
+      if (!taskRes.ok || !taskData.task) { setError(taskData.error || "任务不存在"); setLoading(false); return; }
       setTask(taskData.task);
 
+      // 任务信息到了立刻渲染，completions 在后台并行加载
+      setLoading(false);
+
       const code = taskData.task.share_code;
-      const compRes = await fetch(`/api/tasks/${code}/completions`);
-      const compData = await compRes.json();
-      if (compRes.ok) setCompletions(compData.completions || []);
-    } catch { setError("加载失败"); }
-    finally { setLoading(false); }
+      fetch(`/api/tasks/${code}/completions`)
+        .then((res) => res.json())
+        .then((data) => { if (data.completions) setCompletions(data.completions); })
+        .catch(() => {});
+    } catch { setError("加载失败"); setLoading(false); }
   }, [id]);
 
   useEffect(() => {
