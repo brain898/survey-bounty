@@ -53,21 +53,40 @@ export default function TaskDetailPage({
     if (user) loadData();
   }, [user, authLoading, loadData, router]);
 
-  const copyAllWechat = () => {
+  const copyAllInfo = () => {
     const list = completions
       .filter((c) => ["pending", "verified"].includes(c.payment_status))
-      .map((c) => c.completer_wechat)
+      .map((c) => `${c.completer_name || ""} ${c.completer_phone || ""}`.trim())
       .join("\n");
-    if (!list) { setError("没有待处理的微信号"); return; }
+    if (!list) { setError("没有待处理的填写者"); return; }
     navigator.clipboard.writeText(list).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
   };
 
+  const [actioningId, setActioningId] = useState<string | null>(null);
+
   const handleAction = async (completionId: string, action: "verify" | "pay") => {
+    setActioningId(completionId);
+    // 乐观更新：先改 UI
+    const newStatus = action === "verify" ? "verified" : "paid";
+    setCompletions((prev) =>
+      prev.map((c) =>
+        c.id === completionId ? { ...c, payment_status: newStatus } : c
+      )
+    );
     try {
       const res = await fetch(`/api/completions/${completionId}/${action}`, { method: "POST" });
-      if (res.ok) loadData();
-      else { const d = await res.json(); setError(d.error || "操作失败"); }
-    } catch { setError("网络错误"); }
+      if (!res.ok) {
+        const d = await res.json();
+        setError(d.error || "操作失败");
+        // 回滚
+        loadData();
+      }
+    } catch {
+      setError("网络错误");
+      loadData();
+    } finally {
+      setActioningId(null);
+    }
   };
 
   const handleTaskAction = async (action: "close" | "delete") => {
@@ -168,8 +187,8 @@ export default function TaskDetailPage({
       {/* 操作栏 */}
       {completions.length > 0 && (
         <div className="mb-4">
-          <Button variant="outline" size="sm" onClick={copyAllWechat} className="w-full sm:w-auto">
-            {copied ? "已复制 ✓" : "一键复制待处理微信号"}
+          <Button variant="outline" size="sm" onClick={copyAllInfo} className="w-full sm:w-auto">
+            {copied ? "已复制 ✓" : "一键复制填写者信息"}
           </Button>
         </div>
       )}
@@ -192,7 +211,8 @@ export default function TaskDetailPage({
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-sm truncate">{c.completer_wechat}</span>
+                      <span className="font-medium text-sm truncate">{c.completer_name || "未填写"}</span>
+                      <span className="text-xs text-muted-foreground">{c.completer_phone || ""}</span>
                       <Badge variant={status.variant} className="shrink-0 text-xs">{status.label}</Badge>
                     </div>
                     <span className="text-xs text-muted-foreground shrink-0">

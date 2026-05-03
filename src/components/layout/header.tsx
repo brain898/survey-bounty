@@ -36,6 +36,9 @@ export function Header() {
 
         {/* 桌面端导航 */}
         <nav className="hidden sm:flex items-center gap-3">
+          <Link href="/my">
+            <Button variant="ghost" size="sm">我的提交</Button>
+          </Link>
           {loading ? (
             <div className="h-9 w-20 animate-pulse rounded bg-muted" />
           ) : user ? (
@@ -94,6 +97,9 @@ export function Header() {
                       </p>
                     </div>
                     <Separator />
+                    <Link href="/my" onClick={() => setOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">我的提交</Button>
+                    </Link>
                     {navLinks.map((link) => (
                       <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start">{link.label}</Button>
@@ -106,6 +112,10 @@ export function Header() {
                   </>
                 ) : (
                   <>
+                    <Link href="/my" onClick={() => setOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">我的提交</Button>
+                    </Link>
+                    <Separator />
                     <Link href="/auth/login" onClick={() => setOpen(false)}>
                       <Button variant="outline" className="w-full">登录</Button>
                     </Link>

@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { uploadImage } from "@/lib/supabase/storage";
-import type { Task, CreditScore } from "@/types/database";
+import type { Task } from "@/types/database";
 
 export default function TaskFillPage({
   params,
@@ -18,10 +18,16 @@ export default function TaskFillPage({
 }) {
   const { code } = use(params);
   const [task, setTask] = useState<Task | null>(null);
-  const [credit, setCredit] = useState<CreditScore | null>(null);
+  const [publisherStats, setPublisherStats] = useState<{
+    total_published: number;
+    total_completions: number;
+    payment_rate: number | null;
+    avg_response_hours: number | null;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [wechat, setWechat] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +39,7 @@ export default function TaskFillPage({
       .then((res) => res.json())
       .then((data) => {
         if (data.error) setError(data.error);
-        else { setTask(data.task); setCredit(data.credit); }
+        else { setTask(data.task); setPublisherStats(data.publisher_stats); }
       })
       .catch(() => setError("加载失败"))
       .finally(() => setLoading(false));
@@ -52,7 +58,8 @@ export default function TaskFillPage({
     e.preventDefault();
     setError("");
 
-    if (!wechat.trim()) { setError("请填写微信号"); return; }
+    if (!name.trim()) { setError("请填写姓名"); return; }
+    if (!phone.trim()) { setError("请填写手机号"); return; }
     if (!proofFile) { setError("请上传完成截图"); return; }
 
     setSubmitting(true);
@@ -62,7 +69,7 @@ export default function TaskFillPage({
       const res = await fetch(`/api/tasks/${code}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wechat, proof_screenshot_url: proofUrl }),
+        body: JSON.stringify({ name: name.trim(), phone: phone.trim(), proof_screenshot_url: proofUrl }),
       });
 
       const data = await res.json();
@@ -114,11 +121,20 @@ export default function TaskFillPage({
                 赏金 <strong className="text-lg">{((task?.reward_amount || 0) / 100).toFixed(2)}</strong> 元
               </p>
               <p className="text-xs text-green-600 dark:text-green-500 mt-1">
-                审核通过后通过微信红包转账
+                审核通过后发布者将通过微信手机号转账
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                平台不担保资金到账，请自行与发布者确认
               </p>
             </div>
             <p className="text-xs text-muted-foreground mt-4">
               记录编号：{completionId}
+            </p>
+            <a href="/my" className="inline-block mt-4">
+              <Button variant="outline" size="sm">查看我的提交状态</Button>
+            </a>
+            <p className="text-xs text-muted-foreground mt-2">
+              用此手机号登录可随时查看审核和收款进度
             </p>
           </CardContent>
         </Card>
@@ -170,17 +186,22 @@ export default function TaskFillPage({
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
               剩余 {remaining} 个名额
             </span>
-            {credit && (
-              <span className="flex items-center gap-1">
-                信用
-                <Badge
-                  variant={credit.credit_score >= 80 ? "default" : "destructive"}
-                  className="text-xs px-1.5 py-0"
-                >
-                  {credit.credit_score}
-                </Badge>
-              </span>
-            )}
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
+              {publisherStats && publisherStats.total_published > 0 ? (
+                <>
+                  已发 {publisherStats.total_published} 单
+                  {publisherStats.payment_rate !== null && (
+                    <> · {publisherStats.payment_rate}% 按时付款</>
+                  )}
+                  {publisherStats.avg_response_hours !== null && (
+                    <> · 平均 {publisherStats.avg_response_hours}h 回复</>
+                  )}
+                </>
+              ) : (
+                "新发布者"
+              )}
+            </span>
           </div>
         </CardHeader>
       </Card>
@@ -227,6 +248,13 @@ export default function TaskFillPage({
         </Alert>
       )}
 
+      {/* 免责提示 */}
+      <Alert className="mb-5 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+        <AlertDescription className="text-sm text-amber-800 dark:text-amber-300">
+          本平台仅提供任务撮合服务。报酬由发布者通过微信直接转账，平台不担保资金安全。
+        </AlertDescription>
+      </Alert>
+
       {/* 提交表单 */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <p className="text-sm font-medium text-muted-foreground">
@@ -266,20 +294,32 @@ export default function TaskFillPage({
           </CardContent>
         </Card>
 
-        {/* 微信号 */}
+        {/* 姓名 + 手机号 */}
         <Card>
           <CardContent className="pt-5">
-            <div className="space-y-2">
-              <Label htmlFor="wechat" className="text-sm font-medium">微信号 *</Label>
-              <Input
-                id="wechat"
-                placeholder="你的微信号"
-                value={wechat}
-                onChange={(e) => setWechat(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                发布者审核通过后通过微信红包给你转账
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">姓名 *</Label>
+                <Input
+                  id="name"
+                  placeholder="真名或微信昵称"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium">手机号 *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="用于微信转账收款"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  发布者通过微信手机号转账给你
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
