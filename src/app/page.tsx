@@ -154,7 +154,11 @@ export default function HomePage() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/70" />
-              微信红包直付
+              微信直付
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500/70" />
+              撮合不担保
             </span>
           </div>
         </div>

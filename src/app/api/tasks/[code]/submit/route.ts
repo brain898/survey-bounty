@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
-import { isValidWechat } from "@/lib/utils/share-code";
+import { isValidName, isValidPhone } from "@/lib/utils/share-code";
 import { checkRateLimit } from "@/lib/utils/rate-limit";
 
 const ERROR_MAP: Record<string, { status: number; message: string }> = {
@@ -25,23 +25,36 @@ export async function POST(
   const supabase = await createClient();
   const body = await request.json();
 
-  const wechat = body.wechat?.trim();
+  const name = body.name?.trim();
+  const phone = body.phone?.trim();
   const proof_screenshot_url = body.proof_screenshot_url || null;
 
-  if (!wechat) {
-    return NextResponse.json({ error: "请填写微信号" }, { status: 400 });
+  if (!name) {
+    return NextResponse.json({ error: "请填写姓名" }, { status: 400 });
   }
 
-  if (!isValidWechat(wechat)) {
+  if (!isValidName(name)) {
     return NextResponse.json(
-      { error: "微信号格式不正确（6-20位，以字母开头，只能包含字母、数字、下划线、短横线）" },
+      { error: "姓名长度需在 2-50 个字符之间" },
+      { status: 400 }
+    );
+  }
+
+  if (!phone) {
+    return NextResponse.json({ error: "请填写手机号" }, { status: 400 });
+  }
+
+  if (!isValidPhone(phone)) {
+    return NextResponse.json(
+      { error: "手机号格式不正确（请输入 11 位中国大陆手机号）" },
       { status: 400 }
     );
   }
 
   const { data, error } = await supabase.rpc("submit_task_completion", {
     p_share_code: code,
-    p_wechat: wechat,
+    p_name: name,
+    p_phone: phone,
     p_proof_url: proof_screenshot_url,
   });
 
