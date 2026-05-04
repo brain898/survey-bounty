@@ -65,6 +65,45 @@ export interface CreditScore {
 }
 
 // ============================================================
+// AI 写问卷类型
+// ============================================================
+
+export type QuestionType = "single" | "multiple" | "text" | "essay" | "rating" | "matrix" | "sort";
+
+export interface SurveyQuestion {
+  id: string;              // 前端生成的临时 ID
+  type: QuestionType;
+  text: string;
+  options?: string[];      // 单选/多选/量表/排序/矩阵列标
+  rows?: string[];         // 矩阵题行标
+  required?: boolean;
+}
+
+export interface AiSurveySession {
+  id: string;
+  user_id: string;
+  title: string;
+  summary: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AiSurveyMessage {
+  id: string;
+  session_id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  questions_snapshot: SurveyQuestion[] | null;
+  created_at: string;
+}
+
+export interface AiSurveyQuota {
+  user_id: string;
+  usage_date: string;
+  used_count: number;
+}
+
+// ============================================================
 // Supabase Database 类型
 // ============================================================
 
@@ -90,6 +129,21 @@ export interface Database {
         Row: CreditScore;
         Insert: Omit<CreditScore, "updated_at">;
         Update: Partial<Omit<CreditScore, "user_id">>;
+      };
+      ai_survey_sessions: {
+        Row: AiSurveySession;
+        Insert: Omit<AiSurveySession, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<AiSurveySession, "id" | "user_id" | "created_at">>;
+      };
+      ai_survey_messages: {
+        Row: AiSurveyMessage;
+        Insert: Omit<AiSurveyMessage, "id" | "created_at">;
+        Update: Partial<Omit<AiSurveyMessage, "id" | "session_id" | "created_at">>;
+      };
+      ai_survey_quota: {
+        Row: AiSurveyQuota;
+        Insert: Omit<AiSurveyQuota, never>;
+        Update: Partial<Omit<AiSurveyQuota, "user_id" | "usage_date">>;
       };
     };
   };

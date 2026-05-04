@@ -21,6 +21,7 @@ export function Header() {
     ? [
         { href: "/dashboard", label: "我的任务" },
         { href: "/dashboard/create", label: "发布任务" },
+        { href: "/ai-survey", label: "AI写问卷" },
       ]
     : [];
 

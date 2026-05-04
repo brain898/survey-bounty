@@ -110,6 +110,37 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* AI 写问卷入口 */}
+        <div className="animate-fade-in-up delay-350 mb-8 sm:mb-14">
+          <Link href="/ai-survey">
+            <Card className="card-hover relative overflow-hidden border-0 bg-gradient-to-br from-primary/5 via-card/80 to-cyan-500/5 backdrop-blur-sm shadow-sm cursor-pointer group">
+              <CardContent className="py-5 sm:py-6 flex flex-col sm:flex-row items-center gap-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary shrink-0">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+                    <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="text-center sm:text-left flex-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                    <h3 className="text-base font-semibold">AI 写问卷</h3>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                      NEW
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    不知道问什么？跟 AI 聊几句，帮你理清需求，自动生成问卷题目
+                  </p>
+                </div>
+                <span className="text-sm text-primary font-medium group-hover:underline shrink-0">
+                  立即使用 →
+                </span>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
         {/* 流程说明 */}
         <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-3">
           {steps.map((step, i) => (
